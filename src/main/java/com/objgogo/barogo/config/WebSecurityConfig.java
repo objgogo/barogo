@@ -29,6 +29,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authRequest -> authRequest
                         .antMatchers(
                                 "/api/login/test",
+                                "/api/account",
                                 "/v2/api-docs",
                                 "/h2-console/**",
                                 "/swagger-resources/**",
@@ -36,7 +37,8 @@ public class WebSecurityConfig {
                                 "/webjars/**",
                                 "/swagger/**",
                                 "/swagger-ui/**").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().authenticated()
+                )
                 .headers().frameOptions().disable().and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
