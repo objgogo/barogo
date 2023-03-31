@@ -1,5 +1,6 @@
 package com.objgogo.barogo.api.order.entity;
 
+import com.objgogo.barogo.api.account.entity.AccountEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,15 +18,26 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @ManyToOne(targetEntity = AccountEntity.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    private AccountEntity account;
+
     @Column(name = "order_from")
     private String orderFrom;
 
     @Column(name = "order_to")
     private String orderTo;
 
+    @Column(name = "subject")
+    private String subject;
+
+    @Column(name = "demand")
+    private String demand;
+
     @Column(name = "order_dt")
     private LocalDateTime orderDt;
 
-    @OneToMany(mappedBy = "orderId" ,targetEntity = OrderStatusEntity.class, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "order" ,targetEntity = OrderStatusEntity.class, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     private List<OrderStatusEntity> orderStatusEntityList;
 }

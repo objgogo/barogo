@@ -1,5 +1,6 @@
 package com.objgogo.barogo.api.account.entity;
 
+import com.objgogo.barogo.api.order.entity.OrderEntity;
 import com.objgogo.barogo.common.UserType;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Entity
+@Entity(name = "account")
 @Table(name = "account")
 @Getter
 @Setter
@@ -70,4 +71,8 @@ public class AccountEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
+    @OneToMany(mappedBy = "account", targetEntity = OrderEntity.class, fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST})
+    private List<OrderEntity> orderEntityList;
 }

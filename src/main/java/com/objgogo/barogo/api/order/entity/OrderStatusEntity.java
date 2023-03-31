@@ -27,7 +27,7 @@ public class OrderStatusEntity {
 
     @ManyToOne(targetEntity = OrderEntity.class, fetch = FetchType.LAZY)
     @JoinColumn(name="order_id", referencedColumnName="id")
-    private OrderEntity orderId;
+    private OrderEntity order;
 
 
 }
