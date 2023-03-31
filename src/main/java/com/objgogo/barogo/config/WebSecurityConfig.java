@@ -30,6 +30,7 @@ public class WebSecurityConfig {
                         .antMatchers(
                                 "/api/login/test",
                                 "/api/account",
+                                "/api/login",
                                 "/v2/api-docs",
                                 "/h2-console/**",
                                 "/swagger-resources/**",

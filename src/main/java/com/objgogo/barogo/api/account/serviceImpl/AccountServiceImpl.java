@@ -9,6 +9,8 @@ import com.objgogo.barogo.common.util.PasswordUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -28,6 +30,7 @@ public class AccountServiceImpl implements AccountService {
         ModelMapper mapper = new ModelMapper();
         registerUserRequest.setPassword(passwordUtil.passwordEncoding(registerUserRequest.getPassword()));
         AccountEntity accountEntity = mapper.map(registerUserRequest,AccountEntity.class);
+        accountEntity.setCreateDt(LocalDateTime.now());
 
 
         accountEntity = accountRepository.save(accountEntity);

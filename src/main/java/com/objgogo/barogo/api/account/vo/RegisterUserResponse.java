@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class RegisterUserResponse {
@@ -22,7 +23,7 @@ public class RegisterUserResponse {
     private String username;
 
     @ApiModelProperty(name = "계정 타입 (ADMIN,DELIVERY,USER)")
-    private UserType userType;
+    private List<String> roles;
 
     @ApiModelProperty(name = "생성 일")
     private LocalDateTime createDt;

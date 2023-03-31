@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.objgogo.barogo.BarogoApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-03-30T07:17:30" hostname="DESKTOP-9G4GFSV" time="0.07">
-  <properties/>
-  <testcase name="modelMapperTest()" classname="com.objgogo.barogo.BarogoApplicationTests" time="0.07"/>
-  <system-out><![CDATA[AccountEntity(id=null, name=test, password=1234, userType=USER, createDt=2023-03-30T16:17:30.788067300)
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

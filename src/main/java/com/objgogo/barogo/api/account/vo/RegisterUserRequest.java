@@ -8,6 +8,7 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.List;
 
 
 @Data
@@ -27,8 +28,8 @@ public class RegisterUserRequest {
     @NotEmpty(message = "비밀번호를 입력해 주세요")
     private String password;
 
-    @ApiModelProperty(name = "계정 타입 (ADMIN,DELIVERY,USER)")
+    @ApiModelProperty(name = "계정 타입 [ADMIN,DELIVERY,USER]")
     @NotEmpty(message = "계정 타입을 입력해 주세요")
-    private UserType userType;
+    private List<String> roles;
 
 }
