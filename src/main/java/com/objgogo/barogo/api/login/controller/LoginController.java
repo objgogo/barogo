@@ -30,7 +30,7 @@ public class LoginController {
 
     @PostMapping("")
     @ApiOperation(value = "사용자 로그인")
-    public ResponseEntity<JwtTokenResponse> login(@RequestBody LoginRequest req){
+    public ResponseEntity<JwtTokenResponse> login(@RequestBody LoginRequest req) throws Exception {
         return ResponseEntity.ok(loginService.login(req));
 
     }
