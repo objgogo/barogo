@@ -4,6 +4,7 @@ import com.objgogo.barogo.api.account.entity.AccountEntity;
 import com.objgogo.barogo.api.delivery.entity.DeliveryEntity;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -28,6 +29,15 @@ public class OrderEntity {
 
     @Column(name = "order_to", columnDefinition = "VARCHAR(100) COMMENT '도착지 주소'")
     private String orderTo;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "gu")
+    private String gu;
+
+    @Column(name = "dong")
+    private String dong;
 
     @Column(name = "subject")
     private String subject;
