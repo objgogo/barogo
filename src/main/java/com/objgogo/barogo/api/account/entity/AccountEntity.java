@@ -1,5 +1,6 @@
 package com.objgogo.barogo.api.account.entity;
 
+import com.objgogo.barogo.api.delivery.entity.DeliveryEntity;
 import com.objgogo.barogo.api.order.entity.OrderEntity;
 import com.objgogo.barogo.common.UserType;
 import lombok.Getter;
@@ -75,4 +76,7 @@ public class AccountEntity implements UserDetails {
 
     @OneToMany(mappedBy = "account", targetEntity = OrderEntity.class, fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST})
     private List<OrderEntity> orderEntityList;
+
+    @OneToOne(mappedBy = "account", targetEntity = DeliveryEntity.class, fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST})
+    private DeliveryEntity delivery;
 }

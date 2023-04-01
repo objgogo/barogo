@@ -54,6 +54,11 @@ dependencies {
 
     //model mapper
     implementation 'org.modelmapper:modelmapper:2.4.4'
+
+    //querydsl
+    implementation 'com.querydsl:querydsl-jpa'
+    implementation 'com.querydsl:querydsl-apt'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0"
 }
 
 tasks.named('test') {

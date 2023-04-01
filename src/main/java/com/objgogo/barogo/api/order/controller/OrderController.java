@@ -22,7 +22,7 @@ public class OrderController {
 
     @PostMapping("")
     @ApiOperation(value = "Order 등록 API")
-    public ResponseEntity<RegisterOrderResponse> registerOrder(@RequestBody RegisterOrderRequest req){
+    public ResponseEntity<RegisterOrderResponse> registerOrder(@RequestBody RegisterOrderRequest req) throws Exception {
         return ResponseEntity.ok(orderService.registerOrder(req));
     }
 }
