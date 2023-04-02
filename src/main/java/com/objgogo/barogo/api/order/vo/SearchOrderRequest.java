@@ -20,4 +20,8 @@ public class SearchOrderRequest {
     private LocalDateTime time;
 
     private OrderStatus status;
+
+    private Integer pageNum;
+
+    private Integer pageSize;
 }

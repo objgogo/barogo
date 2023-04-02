@@ -5,6 +5,10 @@ import com.objgogo.barogo.api.account.repository.AccountRepository;
 import com.objgogo.barogo.api.account.service.AccountService;
 import com.objgogo.barogo.api.account.vo.RegisterUserRequest;
 import com.objgogo.barogo.api.account.vo.RegisterUserResponse;
+import com.objgogo.barogo.api.delivery.entity.DeliveryEntity;
+import com.objgogo.barogo.api.delivery.entity.DeliveryStatusEntity;
+import com.objgogo.barogo.api.delivery.repository.DeliveryRepository;
+import com.objgogo.barogo.api.delivery.repository.DeliveryStatusRepository;
 import com.objgogo.barogo.api.login.service.LoginService;
 import com.objgogo.barogo.api.login.vo.LoginRequest;
 import com.objgogo.barogo.api.order.entity.OrderEntity;
@@ -15,6 +19,7 @@ import com.objgogo.barogo.api.order.repository.OrderRepository;
 import com.objgogo.barogo.api.order.repository.OrderStatusRepository;
 import com.objgogo.barogo.api.order.service.OrderService;
 import com.objgogo.barogo.api.order.vo.SearchOrderRequest;
+import com.objgogo.barogo.common.DeliveryStatus;
 import com.objgogo.barogo.common.OrderStatus;
 import com.objgogo.barogo.common.UserType;
 import com.objgogo.barogo.common.provider.JwtTokenProvider;
@@ -30,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,6 +73,12 @@ class BarogoApplicationTests {
 
     @Autowired
     private OrderStatusRepository orderStatusRepository;
+
+    @Autowired
+    private DeliveryRepository deliveryRepository;
+
+    @Autowired
+    private DeliveryStatusRepository deliveryStatusRepository;
 
 
 
@@ -135,28 +147,28 @@ class BarogoApplicationTests {
 
     }
 
-    @Test
-    void loginFalse() throws Exception {
-        RegisterUserRequest info = new RegisterUserRequest();
-
-        info.setName("test");
-        info.setPassword("1234");
-        info.setUsername("objgogo");
-        info.setRoles(List.of(new String[]{"USER", "ADMIN"}));
-
-        RegisterUserResponse res = accountService.registerUser(info);
-
-        LoginRequest req = new LoginRequest();
-
-        req.setUsername("objgogo");
-        req.setPassword("12344");
-
-        JwtTokenResponse result = loginService.login(req);
-
-        System.out.println(result.toString());
-
-
-    }
+//    @Test
+//    void loginFalse() throws Exception {
+//        RegisterUserRequest info = new RegisterUserRequest();
+//
+//        info.setName("test");
+//        info.setPassword("1234");
+//        info.setUsername("objgogo");
+//        info.setRoles(List.of(new String[]{"USER", "ADMIN"}));
+//
+//        RegisterUserResponse res = accountService.registerUser(info);
+//
+//        LoginRequest req = new LoginRequest();
+//
+//        req.setUsername("objgogo");
+//        req.setPassword("12344");
+//
+//        JwtTokenResponse result = loginService.login(req);
+//
+//        System.out.println(result.toString());
+//
+//
+//    }
 
     @Test
     void checkAuthority() throws Exception {
@@ -268,7 +280,7 @@ class BarogoApplicationTests {
         osEntity2.setCreateDt(LocalDateTime.now());
 
         OrderStatusEntity osEntity3 = new OrderStatusEntity();
-        osEntity3.setStatus(OrderStatus.ACCEPT);
+        osEntity3.setStatus(OrderStatus.WAIT);
         osEntity3.setOrder(orderEntity3);
         osEntity3.setCreateDt(LocalDateTime.now());
 
@@ -286,6 +298,8 @@ class BarogoApplicationTests {
         SearchOrderRequest req = new SearchOrderRequest();
         req.setCity("서울");
         req.setGu("강동구");
+        req.setPageNum(1);
+        req.setPageSize(10);
         req.setStatus(OrderStatus.WAIT);
 
 
@@ -328,6 +342,110 @@ class BarogoApplicationTests {
         for(OrderEntity o : result){
             System.out.println("결과 >> " + o.getId());
         }
+    }
+
+    @Test
+    void orderAccept(){
+        //사용자 회원 가입
+        //사용자 주문 등록
+        querydslTest();
+
+        //배달원 회원 가입
+        RegisterUserRequest info = new RegisterUserRequest();
+
+        info.setName("test");
+        info.setPassword("1234");
+        info.setUsername("objgogo1");
+        info.setRoles(List.of(new String[]{"DELIVERY"}));
+
+        RegisterUserResponse res = accountService.registerUser(info);
+
+        //배달원 정보
+        Optional<AccountEntity> delivery = accountRepository.findByUsername("objgogo1");
+
+        //배달원 주문 선택
+        //주문 조회
+
+        SearchOrderRequest req = new SearchOrderRequest();
+        req.setCity("서울");
+        req.setGu("강동구");
+        req.setPageNum(1);
+        req.setPageSize(10);
+        req.setStatus(OrderStatus.WAIT);
+
+        QOrderEntity qOrderEntity =QOrderEntity.orderEntity;
+
+        BooleanExpression booleanExpression = null;
+
+        QOrderEntity order = QOrderEntity.orderEntity;
+        QOrderStatusEntity orderStatus = QOrderStatusEntity.orderStatusEntity;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (StringUtils.hasText(req.getCity())) {
+            builder.and(order.city.eq(req.getCity()));
+        }
+
+        if (StringUtils.hasText(req.getDong())) {
+            builder.and(order.dong.eq(req.getDong()));
+        }
+
+        if (StringUtils.hasText(req.getGu())) {
+            builder.and(order.gu.eq(req.getGu()));
+        }
+
+        if (null != req.getStatus()) {
+            JPQLQuery<OrderStatus> subQuery = JPAExpressions
+                    .select(orderStatus.status)
+                    .from(orderStatus)
+                    .where(orderStatus.order.id.eq(order.id))
+                    .orderBy(orderStatus.createDt.desc())
+                    .limit(1);
+
+            builder.and(subQuery.eq(req.getStatus()));
+        }
+
+        List<OrderEntity> result = queryFactory.selectFrom(order)
+                .where(builder)
+                .fetch();
+
+        for(OrderEntity o : result){
+
+            DeliveryEntity deliveryEntity = new DeliveryEntity();
+            deliveryEntity.setOrder(o);
+            deliveryEntity.setAccount(delivery.get());
+            deliveryEntity.setCreateDt(LocalDateTime.now());
+
+            deliveryEntity = deliveryRepository.save(deliveryEntity);
+
+            DeliveryStatusEntity deliveryStatusEntity = new DeliveryStatusEntity();
+            deliveryStatusEntity.setDelivery(deliveryEntity);
+            deliveryStatusEntity.setStatus(DeliveryStatus.RECEIPT);
+            deliveryStatusEntity.setCrateDt(LocalDateTime.now());
+
+            deliveryStatusRepository.save(deliveryStatusEntity);
+        }
+
+        //결과 확인
+
+        List<DeliveryEntity> reDeliveryList = deliveryRepository.findAll();
+
+        for(DeliveryEntity d : reDeliveryList){
+
+
+            System.out.println("결과 배달 식별자>> " + d.getId());
+            System.out.println("결과 배달원 식별자>> " + d.getAccount().getId());
+            System.out.println("결과 주문 식별자>> " + d.getOrder().getId());
+            System.out.println("결과 배달 상태 식별자>> " + deliveryStatusRepository.getOrderStatus(d.getOrder(), PageRequest.of(0,1)).get(0).getStatus().toString() );
+            System.out.println("--------------");
+
+
+        }
+
+
+
+
+
     }
 
 }

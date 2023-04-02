@@ -52,7 +52,7 @@ public class UserUtil {
         Collection<? extends GrantedAuthority> authorities =  user.getAuthorities();
 
         for(GrantedAuthority a : authorities){
-            if(a.getAuthority().equals(type.toString())){
+            if(a.getAuthority().equals("ROLE_" + type.toString())){
                 return true;
             }
         }

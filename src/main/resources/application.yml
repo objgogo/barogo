@@ -17,6 +17,7 @@ spring:
     properties:
       hibername:
         format_sql: true
+    defer-datasource-initialization: true
   h2:
     console:
       enabled: true
@@ -24,6 +25,8 @@ spring:
   swagger:
     config:
       enabled: true
+
+
 
 jwt:
   secret: 58EF93FB9767992A9A3B75CADCA62DDAA91F70D63C3E86032E1DEB01AD5D52FC

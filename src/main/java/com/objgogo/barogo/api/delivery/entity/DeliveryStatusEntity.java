@@ -1,6 +1,7 @@
 package com.objgogo.barogo.api.delivery.entity;
 
 
+import com.objgogo.barogo.common.DeliveryStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,8 +22,9 @@ public class DeliveryStatusEntity {
     @JoinColumn(name = "delivery_id", referencedColumnName = "id")
     private DeliveryEntity delivery;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private DeliveryStatus status;
 
     @Column(name = "create_dt")
     private LocalDateTime crateDt;

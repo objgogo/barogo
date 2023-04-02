@@ -1,7 +1,11 @@
 package com.objgogo.barogo.api.order.serviceImpl;
 
 import com.objgogo.barogo.api.account.entity.AccountEntity;
+import com.objgogo.barogo.api.delivery.entity.DeliveryEntity;
+import com.objgogo.barogo.api.delivery.entity.QDeliveryEntity;
+import com.objgogo.barogo.api.delivery.vo.SearchDeliveryRequest;
 import com.objgogo.barogo.api.order.entity.OrderEntity;
+import com.objgogo.barogo.api.order.entity.OrderStatusEntity;
 import com.objgogo.barogo.api.order.entity.QOrderEntity;
 import com.objgogo.barogo.api.order.entity.QOrderStatusEntity;
 import com.objgogo.barogo.api.order.repository.OrderRepository;
@@ -29,6 +33,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -58,6 +63,14 @@ public class OrderServiceImpl implements OrderService {
             orderEntity.setAccount(user);
             orderEntity = orderRepository.save(orderEntity);
 
+
+            OrderStatusEntity orderStatusEntity = new OrderStatusEntity();
+            orderStatusEntity.setOrder(orderEntity);
+            orderStatusEntity.setStatus(OrderStatus.WAIT);
+            orderStatusEntity.setCreateDt(LocalDateTime.now());
+
+            orderStatusRepository.saveAndFlush(orderStatusEntity);
+
             return mapper.map(orderEntity,RegisterOrderResponse.class);
         } else{
             throw new Exception("사용자만 주문을 등록할 수 있습니다.");
@@ -68,6 +81,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderInfo> getOrderList(SearchOrderRequest req) {
 
+        ModelMapper mapper = new ModelMapper();
+
+        int offset = (req.getPageNum()-1) * req.getPageSize();
 
         QOrderEntity order = QOrderEntity.orderEntity;
         QOrderStatusEntity orderStatus = QOrderStatusEntity.orderStatusEntity;
@@ -99,9 +115,47 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderEntity> result = queryFactory.selectFrom(order)
                 .where(builder)
+                .offset(offset)
+                .limit(req.getPageSize())
+                .orderBy(order.orderDt.desc())
                 .fetch();
 
+        List<OrderInfo> res = new LinkedList<>();
+        for(OrderEntity o : result){
+            res.add(mapper.map(o, OrderInfo.class));
+        }
 
-        return null;
+
+        return res;
+    }
+
+    @Override
+    public List<OrderInfo> getDeliveryOrderList(SearchDeliveryRequest req) {
+
+        QDeliveryEntity qDeliveryEntity = QDeliveryEntity.deliveryEntity;
+
+        int offset = (req.getPageNum()-1) * req.getPageSize();
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        List<DeliveryEntity> deliveryEntityList = queryFactory.selectFrom(qDeliveryEntity)
+                .where(
+                        qDeliveryEntity.createDt.between(req.getStartDt(),req.getEndDt()))
+                .orderBy(qDeliveryEntity.createDt.desc())
+                .offset(offset)
+                .limit(req.getPageSize()).fetch();
+
+        ModelMapper mapper = new ModelMapper();
+        List<OrderInfo> res = new LinkedList<>();
+
+        for(DeliveryEntity d : deliveryEntityList){
+            OrderEntity order = d.getOrder();
+
+            res.add(mapper.map(order,OrderInfo.class));
+
+        }
+
+
+        return res;
     }
 }

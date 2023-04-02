@@ -16,6 +16,15 @@ public class RegisterOrderRequest {
     @ApiModelProperty(name = "배송지 주소")
     private String orderFrom;
 
+    @ApiModelProperty(name = "배송지 시")
+    private String city;
+
+    @ApiModelProperty(name = "배송지 구")
+    private String gu;
+
+    @ApiModelProperty(name = "배송지 동")
+    private String dong;
+
     @ApiModelProperty(name = "제목")
     private String subject;
 

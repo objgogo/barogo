@@ -2,12 +2,14 @@ package com.objgogo.barogo.api.delivery.serviceImpl;
 
 import com.objgogo.barogo.api.account.entity.AccountEntity;
 import com.objgogo.barogo.api.delivery.entity.DeliveryEntity;
+import com.objgogo.barogo.api.delivery.entity.DeliveryStatusEntity;
 import com.objgogo.barogo.api.delivery.repository.DeliveryRepository;
 import com.objgogo.barogo.api.delivery.repository.DeliveryStatusRepository;
 import com.objgogo.barogo.api.delivery.service.DeliveryService;
 import com.objgogo.barogo.api.delivery.vo.TakeOrderRequest;
 import com.objgogo.barogo.api.order.entity.OrderEntity;
 import com.objgogo.barogo.api.order.repository.OrderRepository;
+import com.objgogo.barogo.common.DeliveryStatus;
 import com.objgogo.barogo.common.UserType;
 import com.objgogo.barogo.common.util.UserUtil;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,15 @@ public class DeliveryServiceImpl implements DeliveryService {
                 deliveryEntity.setAccount(deliveryUser);
                 deliveryEntity.setCreateDt(LocalDateTime.now());
 
-                deliveryRepository.save(deliveryEntity);
+                deliveryEntity = deliveryRepository.save(deliveryEntity);
+
+                DeliveryStatusEntity deliveryStatusEntity = new DeliveryStatusEntity();
+
+                deliveryStatusEntity.setDelivery(deliveryEntity);
+                deliveryStatusEntity.setStatus(DeliveryStatus.RECEIPT);
+                deliveryStatusEntity.setCrateDt(LocalDateTime.now());
+
+                deliveryStatusRepository.save(deliveryStatusEntity);
 
             }else{
                 throw new Exception("존재하지 않는 Order 입니다.");
