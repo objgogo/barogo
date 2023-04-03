@@ -28,4 +28,10 @@ public class OrderInfo {
     @ApiModelProperty(name = "주문 등록 시간")
     private LocalDateTime orderDt;
 
+    @ApiModelProperty(name = "배달 최종 상태")
+    private String deliveryStatus;
+
+    @ApiModelProperty(name = "주문 최종 상태")
+    private String orderStatus;
+
 }

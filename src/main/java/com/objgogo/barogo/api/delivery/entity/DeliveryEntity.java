@@ -23,7 +23,7 @@ public class DeliveryEntity {
     @JoinColumn(name = "order_id")
     private OrderEntity order;
 
-    @OneToOne(targetEntity = AccountEntity.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = AccountEntity.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private AccountEntity account;
 

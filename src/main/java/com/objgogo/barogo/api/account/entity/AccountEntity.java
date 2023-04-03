@@ -77,6 +77,6 @@ public class AccountEntity implements UserDetails {
     @OneToMany(mappedBy = "account", targetEntity = OrderEntity.class, fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST})
     private List<OrderEntity> orderEntityList;
 
-    @OneToOne(mappedBy = "account", targetEntity = DeliveryEntity.class, fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST})
-    private DeliveryEntity delivery;
+    @OneToMany(mappedBy = "account", targetEntity = DeliveryEntity.class, fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST})
+    private List<DeliveryEntity> delivery;
 }

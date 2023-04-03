@@ -27,7 +27,7 @@ public class DeliveryStatusEntity {
     private DeliveryStatus status;
 
     @Column(name = "create_dt")
-    private LocalDateTime crateDt;
+    private LocalDateTime createDt;
 
 
 }

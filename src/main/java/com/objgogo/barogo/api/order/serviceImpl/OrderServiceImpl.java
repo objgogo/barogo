@@ -3,6 +3,8 @@ package com.objgogo.barogo.api.order.serviceImpl;
 import com.objgogo.barogo.api.account.entity.AccountEntity;
 import com.objgogo.barogo.api.delivery.entity.DeliveryEntity;
 import com.objgogo.barogo.api.delivery.entity.QDeliveryEntity;
+import com.objgogo.barogo.api.delivery.entity.QDeliveryStatusEntity;
+import com.objgogo.barogo.api.delivery.repository.DeliveryStatusRepository;
 import com.objgogo.barogo.api.delivery.vo.SearchDeliveryRequest;
 import com.objgogo.barogo.api.order.entity.OrderEntity;
 import com.objgogo.barogo.api.order.entity.OrderStatusEntity;
@@ -15,6 +17,7 @@ import com.objgogo.barogo.api.order.vo.OrderInfo;
 import com.objgogo.barogo.api.order.vo.RegisterOrderRequest;
 import com.objgogo.barogo.api.order.vo.RegisterOrderResponse;
 import com.objgogo.barogo.api.order.vo.SearchOrderRequest;
+import com.objgogo.barogo.common.DeliveryStatus;
 import com.objgogo.barogo.common.OrderStatus;
 import com.objgogo.barogo.common.UserType;
 import com.objgogo.barogo.common.util.UserUtil;
@@ -26,6 +29,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -43,13 +47,15 @@ public class OrderServiceImpl implements OrderService {
     private OrderStatusRepository orderStatusRepository;
     private UserUtil userUtil;
     private JPAQueryFactory queryFactory;
+    private DeliveryStatusRepository deliveryStatusRepository;
 
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderStatusRepository orderStatusRepository, UserUtil userUtil, JPAQueryFactory queryFactory) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderStatusRepository orderStatusRepository, UserUtil userUtil, JPAQueryFactory queryFactory, DeliveryStatusRepository deliveryStatusRepository) {
         this.orderRepository = orderRepository;
         this.orderStatusRepository = orderStatusRepository;
         this.userUtil = userUtil;
         this.queryFactory = queryFactory;
+        this.deliveryStatusRepository = deliveryStatusRepository;
     }
 
     @Override
@@ -102,7 +108,7 @@ public class OrderServiceImpl implements OrderService {
             builder.and(order.gu.eq(req.getGu()));
         }
 
-        if (StringUtils.hasText(req.getStatus().toString())) {
+        if ( null != req.getStatus() && StringUtils.hasText(req.getStatus().toString())) {
             JPQLQuery<OrderStatus> subQuery = JPAExpressions
                     .select(orderStatus.status)
                     .from(orderStatus)
@@ -121,8 +127,20 @@ public class OrderServiceImpl implements OrderService {
                 .fetch();
 
         List<OrderInfo> res = new LinkedList<>();
+
+
         for(OrderEntity o : result){
-            res.add(mapper.map(o, OrderInfo.class));
+
+            OrderInfo info = mapper.map(o, OrderInfo.class);
+
+            if(o.getDelivery().getDeliveryStatus().size() != 0){
+                info.setDeliveryStatus(deliveryStatusRepository.getOrderDeliveryStatus(o, PageRequest.of(0,1)).get(0).getStatus().toString());
+            } else {
+                info.setDeliveryStatus("WAIT");
+            }
+            info.setOrderStatus(orderStatusRepository.findTop1ByOrderOrderByCreateDtDesc(o).getStatus().toString());
+
+            res.add(info);
         }
 
 
@@ -132,16 +150,35 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderInfo> getDeliveryOrderList(SearchDeliveryRequest req) {
 
-        QDeliveryEntity qDeliveryEntity = QDeliveryEntity.deliveryEntity;
+        QDeliveryEntity delivery = QDeliveryEntity.deliveryEntity;
+        QDeliveryStatusEntity deliveryStatus = QDeliveryStatusEntity.deliveryStatusEntity;
 
         int offset = (req.getPageNum()-1) * req.getPageSize();
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        List<DeliveryEntity> deliveryEntityList = queryFactory.selectFrom(qDeliveryEntity)
-                .where(
-                        qDeliveryEntity.createDt.between(req.getStartDt(),req.getEndDt()))
-                .orderBy(qDeliveryEntity.createDt.desc())
+        if(null != req.getStartDt()){
+            builder.and(delivery.createDt.goe(req.getStartDt()));
+        }
+
+        if(null != req.getStartDt()){
+            builder.and(delivery.createDt.loe(req.getEndDt()));
+        }
+
+        if(null != req.getStatus()){
+            JPQLQuery<DeliveryStatus> subQuery = JPAExpressions
+                    .select(deliveryStatus.status)
+                    .from(deliveryStatus)
+                    .where(deliveryStatus.delivery.id.eq(delivery.id))
+                    .orderBy(deliveryStatus.createDt.desc())
+                    .limit(1);
+
+            builder.and(subQuery.eq(req.getStatus()));
+        }
+
+        List<DeliveryEntity> deliveryEntityList = queryFactory.selectFrom(delivery)
+                .where(builder)
+                .orderBy(delivery.createDt.desc())
                 .offset(offset)
                 .limit(req.getPageSize()).fetch();
 
@@ -150,11 +187,8 @@ public class OrderServiceImpl implements OrderService {
 
         for(DeliveryEntity d : deliveryEntityList){
             OrderEntity order = d.getOrder();
-
             res.add(mapper.map(order,OrderInfo.class));
-
         }
-
 
         return res;
     }

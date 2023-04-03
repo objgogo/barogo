@@ -9,6 +9,8 @@ import com.objgogo.barogo.api.delivery.entity.DeliveryEntity;
 import com.objgogo.barogo.api.delivery.entity.DeliveryStatusEntity;
 import com.objgogo.barogo.api.delivery.repository.DeliveryRepository;
 import com.objgogo.barogo.api.delivery.repository.DeliveryStatusRepository;
+import com.objgogo.barogo.api.delivery.vo.DeliveryStatusInfo;
+import com.objgogo.barogo.api.delivery.vo.SearchDeliveryResponse;
 import com.objgogo.barogo.api.login.service.LoginService;
 import com.objgogo.barogo.api.login.vo.LoginRequest;
 import com.objgogo.barogo.api.order.entity.OrderEntity;
@@ -25,14 +27,13 @@ import com.objgogo.barogo.common.UserType;
 import com.objgogo.barogo.common.provider.JwtTokenProvider;
 import com.objgogo.barogo.common.provider.JwtTokenResponse;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.QueryFactory;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -41,11 +42,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 class BarogoApplicationTests {
@@ -421,7 +424,7 @@ class BarogoApplicationTests {
             DeliveryStatusEntity deliveryStatusEntity = new DeliveryStatusEntity();
             deliveryStatusEntity.setDelivery(deliveryEntity);
             deliveryStatusEntity.setStatus(DeliveryStatus.RECEIPT);
-            deliveryStatusEntity.setCrateDt(LocalDateTime.now());
+            deliveryStatusEntity.setCreateDt(LocalDateTime.now());
 
             deliveryStatusRepository.save(deliveryStatusEntity);
         }
@@ -436,15 +439,63 @@ class BarogoApplicationTests {
             System.out.println("결과 배달 식별자>> " + d.getId());
             System.out.println("결과 배달원 식별자>> " + d.getAccount().getId());
             System.out.println("결과 주문 식별자>> " + d.getOrder().getId());
-            System.out.println("결과 배달 상태 식별자>> " + deliveryStatusRepository.getOrderStatus(d.getOrder(), PageRequest.of(0,1)).get(0).getStatus().toString() );
+            System.out.println("결과 배달 상태 식별자>> " + deliveryStatusRepository.getOrderDeliveryStatus(d.getOrder(), PageRequest.of(0,1)).get(0).getStatus().toString() );
             System.out.println("--------------");
 
 
         }
 
+    }
+
+    @Test
+    void modelMapperTest2(){
+
+        DeliveryEntity a = new DeliveryEntity();
+        a.setId(1L);
+        a.setCreateDt(LocalDateTime.now());
 
 
 
+        DeliveryStatusEntity b1 = new DeliveryStatusEntity();
+        b1.setDelivery(a);
+        b1.setStatus(DeliveryStatus.RECEIPT);
+
+        DeliveryStatusEntity b2 = new DeliveryStatusEntity();
+        b2.setDelivery(a);
+        b2.setStatus(DeliveryStatus.START);
+
+        List<DeliveryStatusEntity> b = new LinkedList<>();
+        b.add(b1);
+        b.add(b2);
+
+        a.setDeliveryStatus(b);
+
+        List<DeliveryEntity> alist = new LinkedList<>();
+        alist.add(a);
+
+        ModelMapper modelMapper = new ModelMapper();
+        Type listType = new TypeToken<List<SearchDeliveryResponse>>() {}.getType();
+        modelMapper.createTypeMap(DeliveryStatusEntity.class, DeliveryStatusInfo.class)
+                .addMappings(mapper -> mapper.map(DeliveryStatusEntity::getId, DeliveryStatusInfo::setId))
+                .addMappings(mapper -> mapper.map(DeliveryStatusEntity::getStatus, DeliveryStatusInfo::setStatus));
+        modelMapper.createTypeMap(DeliveryEntity.class, SearchDeliveryResponse.class)
+                .addMappings(mapper -> mapper.map(DeliveryEntity::getId, SearchDeliveryResponse::setId))
+                .addMappings(mapping -> {
+                    mapping.map(DeliveryEntity::getCreateDt, SearchDeliveryResponse::setCreateDt);
+                    mapping.map(DeliveryEntity::getDeliveryStatus, SearchDeliveryResponse::setDeliveryStatusInfoList);
+                });
+
+
+
+        List<SearchDeliveryResponse> responseList = alist.stream()
+                .map(v -> modelMapper.map(v, SearchDeliveryResponse.class))
+                .collect(Collectors.toList());
+
+        for (SearchDeliveryResponse t: responseList) {
+            System.out.println(t.getId());
+            System.out.println(t.getDeliveryStatusInfoList().get(0).getStatus().toString());
+            System.out.println(t.getDeliveryStatusInfoList().get(1).getStatus().toString());
+        }
 
     }
 
