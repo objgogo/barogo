@@ -17,6 +17,7 @@ import com.objgogo.barogo.api.order.vo.*;
 import com.objgogo.barogo.common.DeliveryStatus;
 import com.objgogo.barogo.common.OrderStatus;
 import com.objgogo.barogo.common.UserType;
+import com.objgogo.barogo.common.exception.BarogoException;
 import com.objgogo.barogo.common.util.UserUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPAExpressions;
@@ -71,7 +72,8 @@ public class OrderServiceImpl implements OrderService {
 
             return mapper.map(orderEntity,RegisterOrderResponse.class);
         } else{
-            throw new Exception("사용자만 주문을 등록할 수 있습니다.");
+//            throw new Exception("사용자만 주문을 등록할 수 있습니다.");
+            throw new BarogoException("사용자만 주문을 등록할 수 있습니다.","err.order.001");
         }
 
     }
