@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface DeliveryStatusRepository extends JpaRepository<DeliveryStatusEntity, Long> {
 
 
+    /* 주문의 배달 상태 최신순으로 정렬*/
     @Query(
             value = "SELECT d FROM DeliveryStatusEntity d WHERE d.delivery.order =:order ORDER BY d.createDt desc"
     )

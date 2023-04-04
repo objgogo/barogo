@@ -13,32 +13,24 @@ import com.objgogo.barogo.api.order.entity.QOrderStatusEntity;
 import com.objgogo.barogo.api.order.repository.OrderRepository;
 import com.objgogo.barogo.api.order.repository.OrderStatusRepository;
 import com.objgogo.barogo.api.order.service.OrderService;
-import com.objgogo.barogo.api.order.vo.OrderInfo;
-import com.objgogo.barogo.api.order.vo.RegisterOrderRequest;
-import com.objgogo.barogo.api.order.vo.RegisterOrderResponse;
-import com.objgogo.barogo.api.order.vo.SearchOrderRequest;
+import com.objgogo.barogo.api.order.vo.*;
 import com.objgogo.barogo.common.DeliveryStatus;
 import com.objgogo.barogo.common.OrderStatus;
 import com.objgogo.barogo.common.UserType;
 import com.objgogo.barogo.common.util.UserUtil;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.SubQueryExpression;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -191,5 +183,44 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return res;
+    }
+
+    @Override
+    public ChangeOrderToResponse changeOrderTo(ChangeOrderToRequest req) throws Exception {
+
+        AccountEntity user = userUtil.me();
+
+        //isMyOrder?
+        Optional<OrderEntity> isMyOrder = orderRepository.findByIdAndAccount(req.getOrderId(),user);
+
+        if(isMyOrder.isPresent()){
+
+            OrderEntity order = isMyOrder.get();
+            OrderStatusEntity orderStatus = orderStatusRepository.findTop1ByOrderOrderByCreateDtDesc(order);
+
+            // 주문이 대기중일떄 만 수정이 가능 하도록 조건을
+            if(orderStatus.getStatus().equals(OrderStatus.WAIT)){
+
+                order.setOrderTo(req.getOrderTo());
+
+                order = orderRepository.save(order);
+
+                OrderStatusEntity newOrderStatus = new OrderStatusEntity();
+                newOrderStatus.setOrder(order);
+                newOrderStatus.setStatus(OrderStatus.MODIFY);
+                newOrderStatus.setCreateDt(LocalDateTime.now());
+
+                orderStatusRepository.save(newOrderStatus);
+
+                ChangeOrderToResponse res = new ChangeOrderToResponse();
+                res.setOrderId(order.getId());
+
+                return res;
+            } else {
+                throw new Exception("주문 접수 전에만 수정이 가능합니다.");
+            }
+        } else {
+            throw new Exception("본인이 등록한 주문만 수정 할 수 있습니다.");
+        }
     }
 }

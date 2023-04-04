@@ -8,8 +8,11 @@ import com.objgogo.barogo.api.delivery.repository.DeliveryStatusRepository;
 import com.objgogo.barogo.api.delivery.service.DeliveryService;
 import com.objgogo.barogo.api.delivery.vo.*;
 import com.objgogo.barogo.api.order.entity.OrderEntity;
+import com.objgogo.barogo.api.order.entity.OrderStatusEntity;
 import com.objgogo.barogo.api.order.repository.OrderRepository;
+import com.objgogo.barogo.api.order.repository.OrderStatusRepository;
 import com.objgogo.barogo.common.DeliveryStatus;
+import com.objgogo.barogo.common.OrderStatus;
 import com.objgogo.barogo.common.UserType;
 import com.objgogo.barogo.common.util.UserUtil;
 import org.modelmapper.ModelMapper;
@@ -30,12 +33,14 @@ public class DeliveryServiceImpl implements DeliveryService {
     private UserUtil userUtil;
     private DeliveryRepository deliveryRepository;
     private DeliveryStatusRepository deliveryStatusRepository;
+    private OrderStatusRepository orderStatusRepository;
 
-    public DeliveryServiceImpl(OrderRepository orderRepository, UserUtil userUtil, DeliveryRepository deliveryRepository, DeliveryStatusRepository deliveryStatusRepository) {
+    public DeliveryServiceImpl(OrderRepository orderRepository, UserUtil userUtil, DeliveryRepository deliveryRepository, DeliveryStatusRepository deliveryStatusRepository, OrderStatusRepository orderStatusRepository) {
         this.orderRepository = orderRepository;
         this.userUtil = userUtil;
         this.deliveryRepository = deliveryRepository;
         this.deliveryStatusRepository = deliveryStatusRepository;
+        this.orderStatusRepository = orderStatusRepository;
     }
 
     @Override
@@ -61,6 +66,15 @@ public class DeliveryServiceImpl implements DeliveryService {
                 deliveryStatusEntity.setCreateDt(LocalDateTime.now());
 
                 deliveryStatusEntity = deliveryStatusRepository.save(deliveryStatusEntity);
+
+                OrderEntity order = checkOrder.get();
+
+                OrderStatusEntity orderStatusEntity = new OrderStatusEntity();
+                orderStatusEntity.setOrder(order);
+                orderStatusEntity.setStatus(OrderStatus.ACCEPT);
+                orderStatusEntity.setCreateDt(LocalDateTime.now());
+
+                orderStatusRepository.saveAndFlush(orderStatusEntity);
 
                 TakeOrderResponse res = new TakeOrderResponse();
                 res.setDeliveryId(deliveryEntity.getId());
@@ -94,8 +108,6 @@ public class DeliveryServiceImpl implements DeliveryService {
                     mapping.map(DeliveryEntity::getId, SearchDeliveryResponse::setId);
                     mapping.map(DeliveryEntity::getDeliveryStatus, SearchDeliveryResponse::setDeliveryStatusInfoList);
                 });
-
-
 
         List<SearchDeliveryResponse> responseList = deliveryEntityList.stream()
                 .map(a -> modelMapper.map(a, SearchDeliveryResponse.class))
