@@ -4,6 +4,7 @@ import com.objgogo.barogo.api.account.service.AccountService;
 import com.objgogo.barogo.api.account.vo.RegisterUserRequest;
 import com.objgogo.barogo.api.account.vo.RegisterUserResponse;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class AccountController {
     }
 
     @PostMapping("")
+    @ApiOperation(value = "회원 가입 API")
     public ResponseEntity<RegisterUserResponse> registerAccount(@Valid @RequestBody RegisterUserRequest req){
         return ResponseEntity.ok(accountService.registerUser(req));
     }

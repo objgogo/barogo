@@ -5,6 +5,6 @@ import com.objgogo.barogo.common.provider.JwtTokenResponse;
 
 public interface LoginService {
 
-    JwtTokenResponse login(LoginRequest req) throws Exception;
+    JwtTokenResponse login(LoginRequest req);
 
 }

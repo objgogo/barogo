@@ -4,6 +4,7 @@ import com.objgogo.barogo.api.account.entity.AccountEntity;
 import com.objgogo.barogo.api.account.repository.AccountRepository;
 import com.objgogo.barogo.api.login.service.LoginService;
 import com.objgogo.barogo.api.login.vo.LoginRequest;
+import com.objgogo.barogo.common.exception.BarogoException;
 import com.objgogo.barogo.common.provider.JwtTokenProvider;
 import com.objgogo.barogo.common.provider.JwtTokenResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,7 +31,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public JwtTokenResponse login(LoginRequest req) throws Exception {
+    public JwtTokenResponse login(LoginRequest req){
 
         Optional<AccountEntity> userInfo = accountRepository.findByUsername(req.getUsername());
 
@@ -43,10 +44,10 @@ public class LoginServiceImpl implements LoginService {
 
                 return jwtTokenProvider.generateToken(authentication);
             } else{
-                throw new Exception("비밀번호 틀림");
+                throw new BarogoException("ERROR.ACCOUNT.004");
             }
         } else {
-            throw new Exception("아이디 정보가 없음");
+            throw new BarogoException("ERROR.ACCOUNT.005");
         }
 
 

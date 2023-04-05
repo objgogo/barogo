@@ -1,7 +1,7 @@
-INSERT INTO account(id, name, username, password, create_dt)
-VALUES (1,'John','objgogo1', '1234','2022-03-01 12:00:00'),
-       (2,'Bob','objgogo2', '1234','2022-03-01 12:00:00'),
-       (3,'Peter','objgogo3', '1234','2022-03-01 12:00:00');
+INSERT INTO account(name, username, password, create_dt)
+VALUES ('사용자','user1', '{bcrypt}$2a$10$U.ULcl4oix58W9e8.6UbVedHtbyPODQeiugNGDgcGv/3veesWLjR6','2022-03-01 12:00:00'),
+       ('라이더','delivery1', '{bcrypt}$2a$10$U.ULcl4oix58W9e8.6UbVedHtbyPODQeiugNGDgcGv/3veesWLjR6','2022-03-01 12:00:00'),
+       ('사용자2','user2', '{bcrypt}$2a$10$U.ULcl4oix58W9e8.6UbVedHtbyPODQeiugNGDgcGv/3veesWLjR6','2022-03-01 12:00:00');
 
 INSERT INTO account_roles(account_id,role)
 VALUES (1,'USER'),

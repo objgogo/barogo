@@ -40,6 +40,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Type;
@@ -82,6 +83,9 @@ class BarogoApplicationTests {
 
     @Autowired
     private DeliveryStatusRepository deliveryStatusRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
 
@@ -497,6 +501,16 @@ class BarogoApplicationTests {
             System.out.println(t.getDeliveryStatusInfoList().get(1).getStatus().toString());
         }
 
+    }
+
+    @Test
+    void passwordEncoderTest(){
+
+        String password = "asdf1234ASDF!";
+
+        String tmp = passwordEncoder.encode(password);
+
+        System.out.println(tmp);
     }
 
 }

@@ -1,0 +1,32 @@
+server:
+  port: 9091
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    url: jdbc:h2:mem:test
+    username: test
+    password: 1234
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibername:
+        format_sql: true
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+
+  swagger:
+    config:
+      enabled: true
+
+
+
+jwt:
+  secret: 58EF93FB9767992A9A3B75CADCA62DDAA91F70D63C3E86032E1DEB01AD5D52FC

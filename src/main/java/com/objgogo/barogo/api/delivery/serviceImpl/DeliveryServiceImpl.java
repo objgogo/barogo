@@ -14,6 +14,7 @@ import com.objgogo.barogo.api.order.repository.OrderStatusRepository;
 import com.objgogo.barogo.common.DeliveryStatus;
 import com.objgogo.barogo.common.OrderStatus;
 import com.objgogo.barogo.common.UserType;
+import com.objgogo.barogo.common.exception.BarogoException;
 import com.objgogo.barogo.common.util.UserUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -83,10 +84,10 @@ public class DeliveryServiceImpl implements DeliveryService {
                 return res;
 
             }else{
-                throw new Exception("존재하지 않는 Order 입니다.");
+                throw new BarogoException("ERROR.DELIVERY.001");
             }
         } else{
-            throw new Exception("Delivery만 주문을 받을 수 있습니다.");
+            throw new BarogoException("ERROR.DELIVERY.002");
         }
     }
 
@@ -142,14 +143,14 @@ public class DeliveryServiceImpl implements DeliveryService {
 
                     return res;
                 } else {
-                    throw new Exception("배달 상태값이 이미 존재 합니다.");
+                    throw new BarogoException("ERROR.DELIVERY.003");
                 }
 
             } else {
-                throw new Exception("배달 접수한 id가 일치하지 않습니다.");
+                throw new BarogoException("ERROR.DELIVERY.004");
             }
         } else {
-            throw new Exception("존재하지 않는 Delivery ID 입니다.");
+            throw new BarogoException("ERROR.DELIVERY.005");
         }
 
 

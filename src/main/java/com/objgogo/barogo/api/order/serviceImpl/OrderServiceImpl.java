@@ -72,8 +72,7 @@ public class OrderServiceImpl implements OrderService {
 
             return mapper.map(orderEntity,RegisterOrderResponse.class);
         } else{
-//            throw new Exception("사용자만 주문을 등록할 수 있습니다.");
-            throw new BarogoException("사용자만 주문을 등록할 수 있습니다.","err.order.001");
+            throw new BarogoException("ERROR.ORDER.001");
         }
 
     }
@@ -127,7 +126,7 @@ public class OrderServiceImpl implements OrderService {
 
             OrderInfo info = mapper.map(o, OrderInfo.class);
 
-            if(o.getDelivery().getDeliveryStatus().size() != 0){
+            if(null != o.getDelivery() && o.getDelivery().getDeliveryStatus().size() != 0){
                 info.setDeliveryStatus(deliveryStatusRepository.getOrderDeliveryStatus(o, PageRequest.of(0,1)).get(0).getStatus().toString());
             } else {
                 info.setDeliveryStatus("WAIT");
@@ -219,10 +218,10 @@ public class OrderServiceImpl implements OrderService {
 
                 return res;
             } else {
-                throw new Exception("주문 접수 전에만 수정이 가능합니다.");
+                throw new BarogoException("ERROR.ORDER.002");
             }
         } else {
-            throw new Exception("본인이 등록한 주문만 수정 할 수 있습니다.");
+            throw new BarogoException("ERROR.ORDER.003");
         }
     }
 }

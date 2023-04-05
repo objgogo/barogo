@@ -3,6 +3,7 @@ package com.objgogo.barogo.api.login.serviceImpl;
 
 import com.objgogo.barogo.api.account.entity.AccountEntity;
 import com.objgogo.barogo.api.account.repository.AccountRepository;
+import com.objgogo.barogo.common.exception.BarogoException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -25,7 +26,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
         return accountRepository.findByUsername(username)
                 .map(this::convertAccountEntityToUserDetails)
-                .orElseThrow(()-> new UsernameNotFoundException("Not fond user info!!"));
+                .orElseThrow(()-> new BarogoException("ERROR.ACCOUNT.005"));
     }
 
     //AccountEntity 정보를 UserDetails로 변환
