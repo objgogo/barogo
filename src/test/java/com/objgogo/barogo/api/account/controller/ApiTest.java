@@ -277,8 +277,6 @@ class ApiTest {
         param.add("pageNum","1");
         param.add("pageSize","10");
 
-
-
         mockMvc.perform(
                 get("/api/order/list")
                 .param("status","WAIT")

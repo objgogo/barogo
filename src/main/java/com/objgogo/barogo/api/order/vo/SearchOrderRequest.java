@@ -7,24 +7,28 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class SearchOrderRequest {
 
-    @ApiModelProperty(value = "city")
+    @ApiModelProperty(value = "출발주소 시")
     private String city;
 
-    @ApiModelProperty(value = "gu")
+    @ApiModelProperty(value = "출발주소 구")
     private String gu;
 
-    @ApiModelProperty(value = "dong")
+    @ApiModelProperty(value = "출발주소 동")
     private String dong;
 
 
-    @ApiModelProperty(value = "time")
-    private LocalDateTime time;
+    @ApiModelProperty(value = "검색 startDt")
+    private LocalDate startDt;
+
+    @ApiModelProperty(value = "검색 endDt")
+    private LocalDate endDt;
 
 
     @ApiModelProperty(value = "status")

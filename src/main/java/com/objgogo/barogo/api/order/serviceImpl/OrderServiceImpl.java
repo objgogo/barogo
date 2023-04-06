@@ -16,6 +16,7 @@ import com.objgogo.barogo.common.DeliveryStatus;
 import com.objgogo.barogo.common.OrderStatus;
 import com.objgogo.barogo.common.UserType;
 import com.objgogo.barogo.common.exception.BarogoException;
+import com.objgogo.barogo.common.util.SearchUtil;
 import com.objgogo.barogo.common.util.UserUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPAExpressions;
@@ -26,7 +27,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderMenuRepository orderMenuRepository;
 
 
+
     public OrderServiceImpl(OrderRepository orderRepository, OrderStatusRepository orderStatusRepository, UserUtil userUtil, JPAQueryFactory queryFactory, DeliveryStatusRepository deliveryStatusRepository, OrderMenuRepository orderMenuRepository) {
         this.orderRepository = orderRepository;
         this.orderStatusRepository = orderStatusRepository;
@@ -49,6 +54,7 @@ public class OrderServiceImpl implements OrderService {
         this.queryFactory = queryFactory;
         this.deliveryStatusRepository = deliveryStatusRepository;
         this.orderMenuRepository = orderMenuRepository;
+
     }
 
     @Override
@@ -104,6 +110,25 @@ public class OrderServiceImpl implements OrderService {
 
         if (StringUtils.hasText(req.getDong())) {
             builder.and(order.dong.eq(req.getDong()));
+        }
+
+        if( null != req.getStartDt() && null != req.getEndDt()){
+            if(SearchUtil.isDateRangeValid(req.getStartDt(),req.getEndDt(),3L)){
+
+                if(req.getStartDt() != null && null == req.getEndDt()){
+                    LocalDateTime startDt = req.getStartDt().atStartOfDay();
+                    LocalDateTime endDt = LocalDateTime.of(req.getStartDt().plusDays(3), LocalTime.MAX);
+
+                    builder.and(order.orderDt.between(startDt,endDt));
+                } else if(req.getEndDt() != null && null == req.getStartDt()){
+                    LocalDateTime startDt = req.getEndDt().minusDays(3).atStartOfDay();
+                    LocalDateTime endDt = LocalDateTime.of(req.getEndDt(), LocalTime.MAX);
+
+                    builder.and(order.orderDt.between(startDt,endDt));
+                }
+            }
+        } else {
+            throw new BarogoException("ERROR.ORDER.004");
         }
 
         if (StringUtils.hasText(req.getGu())) {
