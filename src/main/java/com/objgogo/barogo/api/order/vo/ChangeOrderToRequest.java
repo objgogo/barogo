@@ -12,7 +12,7 @@ public class ChangeOrderToRequest {
 
     private Long orderId;
 
-    @ApiModelProperty(name = "도착지 주소")
+    @ApiModelProperty(value = "도착지 주소")
     private String orderTo;
 
 

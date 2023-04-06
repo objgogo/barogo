@@ -6,10 +6,8 @@ import com.objgogo.barogo.api.delivery.entity.QDeliveryEntity;
 import com.objgogo.barogo.api.delivery.entity.QDeliveryStatusEntity;
 import com.objgogo.barogo.api.delivery.repository.DeliveryStatusRepository;
 import com.objgogo.barogo.api.delivery.vo.SearchDeliveryRequest;
-import com.objgogo.barogo.api.order.entity.OrderEntity;
-import com.objgogo.barogo.api.order.entity.OrderStatusEntity;
-import com.objgogo.barogo.api.order.entity.QOrderEntity;
-import com.objgogo.barogo.api.order.entity.QOrderStatusEntity;
+import com.objgogo.barogo.api.order.entity.*;
+import com.objgogo.barogo.api.order.repository.OrderMenuRepository;
 import com.objgogo.barogo.api.order.repository.OrderRepository;
 import com.objgogo.barogo.api.order.repository.OrderStatusRepository;
 import com.objgogo.barogo.api.order.service.OrderService;
@@ -41,14 +39,16 @@ public class OrderServiceImpl implements OrderService {
     private UserUtil userUtil;
     private JPAQueryFactory queryFactory;
     private DeliveryStatusRepository deliveryStatusRepository;
+    private OrderMenuRepository orderMenuRepository;
 
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderStatusRepository orderStatusRepository, UserUtil userUtil, JPAQueryFactory queryFactory, DeliveryStatusRepository deliveryStatusRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderStatusRepository orderStatusRepository, UserUtil userUtil, JPAQueryFactory queryFactory, DeliveryStatusRepository deliveryStatusRepository, OrderMenuRepository orderMenuRepository) {
         this.orderRepository = orderRepository;
         this.orderStatusRepository = orderStatusRepository;
         this.userUtil = userUtil;
         this.queryFactory = queryFactory;
         this.deliveryStatusRepository = deliveryStatusRepository;
+        this.orderMenuRepository = orderMenuRepository;
     }
 
     @Override
@@ -67,6 +67,15 @@ public class OrderServiceImpl implements OrderService {
             orderStatusEntity.setOrder(orderEntity);
             orderStatusEntity.setStatus(OrderStatus.WAIT);
             orderStatusEntity.setCreateDt(LocalDateTime.now());
+
+            for(MenuInfo menu : req.getMenuInfoList()){
+                OrderMenuEntity orderMenuEntity = new OrderMenuEntity();
+                orderMenuEntity.setOrder(orderEntity);
+                orderMenuEntity.setAmount(menu.getAmount());
+                orderMenuEntity.setSubject(menu.getSubject());
+
+                orderMenuRepository.save(orderMenuEntity);
+            }
 
             orderStatusRepository.saveAndFlush(orderStatusEntity);
 

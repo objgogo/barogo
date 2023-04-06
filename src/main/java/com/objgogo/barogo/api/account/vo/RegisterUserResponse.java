@@ -13,19 +13,19 @@ import java.util.List;
 @Data
 public class RegisterUserResponse {
 
-    @ApiModelProperty(name = "계정 식별자")
+    @ApiModelProperty(value = "계정 식별자")
     private Long id;
 
-    @ApiModelProperty(name = "이름")
+    @ApiModelProperty(value = "이름")
     private String name;
 
-    @ApiModelProperty(name = "아이디")
+    @ApiModelProperty(value = "아이디")
     private String username;
 
-    @ApiModelProperty(name = "계정 타입 (ADMIN,DELIVERY,USER)")
+    @ApiModelProperty(value = "계정 타입 (ADMIN,DELIVERY,USER)")
     private List<String> roles;
 
-    @ApiModelProperty(name = "생성 일")
+    @ApiModelProperty(value = "생성 일")
     private LocalDateTime createDt;
 
 }

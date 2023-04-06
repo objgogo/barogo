@@ -4,34 +4,40 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 public class OrderInfo {
 
-    @ApiModelProperty(name = "주문 식별자")
+    @ApiModelProperty(value = "주문 식별자")
     private Long id;
 
-    @ApiModelProperty(name = "출발지 주소")
+    @ApiModelProperty(value = "출발지 주소")
     private String orderTo;
 
-    @ApiModelProperty(name = "도착지 주소")
+    @ApiModelProperty(value = "도착지 주소")
     private String orderFrom;
 
-    @ApiModelProperty(name = "제목")
+    @ApiModelProperty(value = "제목")
     private String subject;
 
-    @ApiModelProperty(name = "배송자 요구사항")
+    @ApiModelProperty(value = "배송자 요구사항")
     private String demand;
 
-    @ApiModelProperty(name = "주문 등록 시간")
+    @ApiModelProperty(value = "주문 등록 시간")
     private LocalDateTime orderDt;
 
-    @ApiModelProperty(name = "배달 최종 상태")
+    @ApiModelProperty(value = "배달 최종 상태")
     private String deliveryStatus;
 
-    @ApiModelProperty(name = "주문 최종 상태")
+    @ApiModelProperty(value = "주문 최종 상태")
     private String orderStatus;
+
+    @ApiModelProperty(value = "메뉴 목록")
+    private List<MenuInfo> menuInfoList;
+
 
 }

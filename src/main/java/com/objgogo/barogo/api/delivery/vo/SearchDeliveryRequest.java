@@ -19,9 +19,9 @@ public class SearchDeliveryRequest {
 
     private DeliveryStatus status;
 
-    @ApiModelProperty(name = "페이지 번호", required = true)
+    @ApiModelProperty(required = true)
     private Integer pageNum;
 
-    @ApiModelProperty(name = "페이지 사이즈", required = true)
+    @ApiModelProperty(required = true)
     private Integer pageSize;
 }

@@ -5,6 +5,7 @@ import com.objgogo.barogo.common.OrderStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 
@@ -12,28 +13,28 @@ import java.time.LocalDateTime;
 @Setter
 public class SearchOrderRequest {
 
-    @ApiModelProperty(name = "주소 시")
+    @ApiModelProperty(value = "city")
     private String city;
 
-    @ApiModelProperty(name = "주소 구")
+    @ApiModelProperty(value = "gu")
     private String gu;
 
-    @ApiModelProperty(name = "주소 동")
+    @ApiModelProperty(value = "dong")
     private String dong;
 
 
-    @ApiModelProperty(name = "시간")
+    @ApiModelProperty(value = "time")
     private LocalDateTime time;
 
 
-    @ApiModelProperty(name = "주문 상태")
+    @ApiModelProperty(value = "status")
     private OrderStatus status;
 
 
-    @ApiModelProperty(name = "페이지 번호", required = true)
+    @ApiModelProperty(value = "pageNum", required = true)
     private Integer pageNum;
 
 
-    @ApiModelProperty(name = "페이지 사이즈", required = true)
+    @ApiModelProperty(value = "pageSize", required = true)
     private Integer pageSize;
 }

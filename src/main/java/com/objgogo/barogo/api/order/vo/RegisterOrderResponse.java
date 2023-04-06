@@ -10,22 +10,22 @@ import java.time.LocalDateTime;
 @Setter
 public class RegisterOrderResponse {
 
-    @ApiModelProperty(name = "주문 식별자")
+    @ApiModelProperty(value = "주문 식별자")
     private Long id;
 
-    @ApiModelProperty(name = "주문 요청한 주소")
+    @ApiModelProperty(value = "주문 요청한 주소")
     private String orderTo;
 
-    @ApiModelProperty(name = "배송지 주소")
+    @ApiModelProperty(value = "배송지 주소")
     private String orderFrom;
 
-    @ApiModelProperty(name = "제목")
+    @ApiModelProperty(value = "제목")
     private String subject;
 
-    @ApiModelProperty(name = "요구 사항")
+    @ApiModelProperty(value = "요구 사항")
     private String demand;
 
-    @ApiModelProperty(name = "주문 요청 시간")
+    @ApiModelProperty(value = "주문 요청 시간")
     private LocalDateTime orderDt;
 
 }

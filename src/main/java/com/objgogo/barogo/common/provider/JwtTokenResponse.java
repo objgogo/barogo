@@ -9,12 +9,12 @@ import lombok.*;
 @AllArgsConstructor
 public class JwtTokenResponse {
 
-    @ApiModelProperty(name = "grant type" , example = "Bearer")
+    @ApiModelProperty(value = "grant type" , example = "Bearer")
     private String grantType;
 
-    @ApiModelProperty(name = "access token" , example = "sdfsdfsdfdsf")
+    @ApiModelProperty(value = "access token" , example = "sdfsdfsdfdsf")
     private String accessToken;
 
-    @ApiModelProperty(name = "refresh token" , example = "dsffwsdfsd")
+    @ApiModelProperty(value = "refresh token" , example = "dsffwsdfsd")
     private String refreshToken;
 }

@@ -9,6 +9,7 @@ import com.objgogo.barogo.api.account.service.AccountService;
 import com.objgogo.barogo.api.account.vo.RegisterUserRequest;
 import com.objgogo.barogo.api.login.service.LoginService;
 import com.objgogo.barogo.api.login.vo.LoginRequest;
+import com.objgogo.barogo.api.order.vo.MenuInfo;
 import com.objgogo.barogo.api.order.vo.RegisterOrderRequest;
 import com.objgogo.barogo.api.order.vo.SearchOrderRequest;
 import com.objgogo.barogo.common.OrderStatus;
@@ -32,6 +33,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -232,11 +234,6 @@ class ApiTest {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-
-
-
-
-
         for(int i=0;i<21;i++){
 
             RegisterOrderRequest orderReq = new RegisterOrderRequest();
@@ -248,6 +245,17 @@ class ApiTest {
             orderReq.setDong("길동");
             orderReq.setSubject("배달 품목");
             orderReq.setDemand("안전 유의하며 조심히 배달 부탁");
+            List<MenuInfo> menuInfoList = new LinkedList<>();
+
+            for(int j=0;j<i+1;j++){
+                MenuInfo menu = new MenuInfo();
+                menu.setSubject("떡볶이");
+                menu.setAmount(j+1);
+
+                menuInfoList.add(menu);
+            }
+            orderReq.setMenuInfoList(menuInfoList);
+
 
             String jsonReq = mapper.writeValueAsString(orderReq);
 

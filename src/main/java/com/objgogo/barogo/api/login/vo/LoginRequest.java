@@ -9,9 +9,9 @@ import lombok.Setter;
 @Data
 public class LoginRequest {
 
-    @ApiModelProperty(name = "사용자 아이디")
+    @ApiModelProperty(value = "사용자 아이디")
     private String username;
 
-    @ApiModelProperty(name = "사용자 비밀번호")
+    @ApiModelProperty(value = "사용자 비밀번호")
     private String password;
 }
