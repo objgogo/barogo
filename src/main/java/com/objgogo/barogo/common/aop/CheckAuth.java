@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -27,13 +29,15 @@ public class CheckAuth {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @Before("@annotation(com.objgogo.barogo.common.annotaion.PossibleAccess) && args(request,..)")
-    public void checkPossibleAccess(JoinPoint joinPoint, HttpServletRequest request) throws Throwable {
+    @Before("@annotation(com.objgogo.barogo.common.annotaion.PossibleAccess)")
+    public void checkPossibleAccess(JoinPoint joinPoint) throws Throwable {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         PossibleAccess possibleAccess = signature.getMethod().getAnnotation(PossibleAccess.class);
         String possibleAccessType = "ROLE_" + possibleAccess.value(); // PossibleAccess 어노테이션의 value 값 가져오기
 
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = servletRequestAttributes.getRequest();
         String token = request.getHeader("Authorization");
 
         Authentication tmp = jwtTokenProvider.getAuthentication(token);
@@ -50,12 +54,8 @@ public class CheckAuth {
         }
 
         if(!check){
-            throw new BarogoException("ERROR.ACCESS.000");
+            throw new BarogoException("ERROR.ACCESS.000",possibleAccessType);
         }
-
-
-
-
 
 
 

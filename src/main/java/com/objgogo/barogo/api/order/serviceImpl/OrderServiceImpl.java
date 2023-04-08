@@ -60,36 +60,29 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public RegisterOrderResponse registerOrder(RegisterOrderRequest req) throws Exception {
 
-        boolean isUser = userUtil.checkAuthority(UserType.USER);
-        if(isUser){
-            AccountEntity user = userUtil.me();
-            ModelMapper mapper = new ModelMapper();
-            OrderEntity orderEntity = mapper.map(req,OrderEntity.class);
-            orderEntity.setAccount(user);
-            orderEntity = orderRepository.save(orderEntity);
+        AccountEntity user = userUtil.me();
+        ModelMapper mapper = new ModelMapper();
+        OrderEntity orderEntity = mapper.map(req,OrderEntity.class);
+        orderEntity.setAccount(user);
+        orderEntity = orderRepository.save(orderEntity);
 
+        OrderStatusEntity orderStatusEntity = new OrderStatusEntity();
+        orderStatusEntity.setOrder(orderEntity);
+        orderStatusEntity.setStatus(OrderStatus.WAIT);
+        orderStatusEntity.setCreateDt(LocalDateTime.now());
 
-            OrderStatusEntity orderStatusEntity = new OrderStatusEntity();
-            orderStatusEntity.setOrder(orderEntity);
-            orderStatusEntity.setStatus(OrderStatus.WAIT);
-            orderStatusEntity.setCreateDt(LocalDateTime.now());
+        for(MenuInfo menu : req.getMenuInfoList()){
+            OrderMenuEntity orderMenuEntity = new OrderMenuEntity();
+            orderMenuEntity.setOrder(orderEntity);
+            orderMenuEntity.setAmount(menu.getAmount());
+            orderMenuEntity.setSubject(menu.getSubject());
 
-            for(MenuInfo menu : req.getMenuInfoList()){
-                OrderMenuEntity orderMenuEntity = new OrderMenuEntity();
-                orderMenuEntity.setOrder(orderEntity);
-                orderMenuEntity.setAmount(menu.getAmount());
-                orderMenuEntity.setSubject(menu.getSubject());
-
-                orderMenuRepository.save(orderMenuEntity);
-            }
-
-            orderStatusRepository.saveAndFlush(orderStatusEntity);
-
-            return mapper.map(orderEntity,RegisterOrderResponse.class);
-        } else{
-            throw new BarogoException("ERROR.ORDER.001");
+            orderMenuRepository.save(orderMenuEntity);
         }
 
+        orderStatusRepository.saveAndFlush(orderStatusEntity);
+
+        return mapper.map(orderEntity,RegisterOrderResponse.class);
     }
 
     @Override
@@ -169,7 +162,6 @@ public class OrderServiceImpl implements OrderService {
 
             res.add(info);
         }
-
 
         return res;
     }

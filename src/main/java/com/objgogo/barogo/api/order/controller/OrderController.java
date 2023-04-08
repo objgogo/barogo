@@ -2,6 +2,7 @@ package com.objgogo.barogo.api.order.controller;
 
 import com.objgogo.barogo.api.order.service.OrderService;
 import com.objgogo.barogo.api.order.vo.*;
+import com.objgogo.barogo.common.annotaion.PossibleAccess;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
@@ -21,18 +22,22 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+
     @PostMapping("")
+    @PossibleAccess("USER")
     @ApiOperation(value = "Order 등록 API")
     public ResponseEntity<RegisterOrderResponse> registerOrder(@RequestBody RegisterOrderRequest req) throws Exception {
         return ResponseEntity.ok(orderService.registerOrder(req));
     }
 
+    @PossibleAccess("USER")
     @GetMapping(value = "/list")
     @ApiOperation(value = "사용자 Order 목록 조회")
     public ResponseEntity<List<OrderInfo>> orderList(@ModelAttribute SearchOrderRequest req){
         return ResponseEntity.ok(orderService.getOrderList(req));
     }
 
+    @PossibleAccess("USER")
     @PostMapping("/change/orderTo")
     @ApiOperation(value = "사용자 Order 도착지 주소 변경 API")
     public ResponseEntity<ChangeOrderToResponse> changeOrderTo(ChangeOrderToRequest req) throws Exception {

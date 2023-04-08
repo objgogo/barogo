@@ -4,6 +4,7 @@ package com.objgogo.barogo.common.exception;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 @Getter
@@ -18,14 +19,31 @@ public class BarogoException extends RuntimeException{
         this.code = code;
     }
 
+    public BarogoException(String code, Object... message){
+
+        super(getMessagesByCode(code,message));
+        this.code = code;
+
+
+
+
+    }
+
     private static String getMessageByCode(String code){
         ResourceBundle bundle = ResourceBundle.getBundle("error");
-        String message = "";
+        String msg = "";
         try {
-            message = bundle.getString(code);
+            msg = bundle.getString(code);
         } catch (Exception e) {
-            message = "Unknown error occurred.";
+            msg = "Unknown error occurred.";
         }
-        return message;
+        return msg;
+    }
+
+    private static String getMessagesByCode(String code, Object... message){
+        ResourceBundle bundle = ResourceBundle.getBundle("error");
+        String msg = bundle.getString(code);
+
+        return MessageFormat.format(msg,message);
     }
 }
