@@ -1,7 +1,5 @@
 # 바로고 API 과제
 
-# API 문서 : http://localhost:9090/swagger-ui.html
-
 # 프로젝트 실행
 ## git clone 이후 gradle 빌들 후 application 실행
 ## clone url : https://github.com/objgogo/barogo.git
@@ -15,6 +13,9 @@
       jpa
       H2
       gradle
+
+# API 문서
+    Swagger 활용(http://localhost:9090/swagger-ui.html)
 
 # API test 방법   
 ### Swagger를 활용

@@ -13,6 +13,7 @@ import com.objgogo.barogo.api.order.vo.MenuInfo;
 import com.objgogo.barogo.api.order.vo.RegisterOrderRequest;
 import com.objgogo.barogo.api.order.vo.SearchOrderRequest;
 import com.objgogo.barogo.common.OrderStatus;
+import com.objgogo.barogo.common.UserType;
 import com.objgogo.barogo.common.provider.JwtTokenResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +66,7 @@ class ApiTest {
     @DisplayName("사용자 가입 테스트 - 정상적인 Request Parameter")
     public void registerUserOK() throws Exception {
         RegisterUserRequest req = new RegisterUserRequest();
-        req.setRoles(List.of(new String[]{"USER"}));
+        req.setRoles(List.of(new UserType[]{UserType.USER, UserType.DELIVERY}));
         req.setName("사용자");
         req.setUsername("objgogo");
         req.setPassword("asdf1234ASDF!");
@@ -83,10 +84,10 @@ class ApiTest {
 
     @Test
     @Order(2)
-    @DisplayName("배달원 가입 테스트 - 정상적인 Request Parameter")
+    @DisplayName("라이더 가입 테스트 - 정상적인 Request Parameter")
     public void registerDeliveryOK() throws Exception {
         RegisterUserRequest req = new RegisterUserRequest();
-        req.setRoles(List.of(new String[]{"DELIVERY"}));
+        req.setRoles(List.of(new UserType[]{UserType.DELIVERY}));
         req.setName("라이더");
         req.setUsername("objgogo1");
         req.setPassword("asdf1234ASDF!");
@@ -186,7 +187,7 @@ class ApiTest {
 
     @Test
     @Order(6)
-    @DisplayName("주문 등록 - 라이더 - 오류 예상")
+    @DisplayName("주문 등록 - UserType 라이더일경우 - 오류 예상")
     public void registerOrderByDelivery() throws Exception {
 
         registerDeliveryOK();
@@ -267,27 +268,28 @@ class ApiTest {
             ).andDo(MockMvcResultHandlers.print());
         }
 
-        SearchOrderRequest req = new SearchOrderRequest();
-        req.setStatus(OrderStatus.WAIT);
-        req.setPageNum(1);
-        req.setPageSize(10);
-
-        MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
-        param.add("status",OrderStatus.WAIT.toString());
-        param.add("pageNum","1");
-        param.add("pageSize","10");
-
         mockMvc.perform(
                 get("/api/order/list")
-                .param("status","WAIT")
-                .param("pageNum","1")
-                .param("pageSize","10")
+                        .param("status","WAIT")
+                        .param("pageNum","1")
+                        .param("pageSize","10")
+//                        .param("startDt","2023-04-08")
+                        .param("endDt","2023-04-09")
+
 
                 .header("Authorization",res.getAccessToken())
         ).andExpect(status().isOk())
         .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    @DisplayName("라이더 주문 조회")
+    void searchOrderByDelivery() throws Exception {
+        registerOrderByUser();
+
 
     }
+
 
 
 }

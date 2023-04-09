@@ -24,21 +24,21 @@ public class DeliveryController {
     }
 
     @PossibleAccess("DELIVERY")
-    @ApiOperation(value = "배달원 주문 수락 API")
+    @ApiOperation(value = "라이더 주문 수락 API")
     @PostMapping("/take")
     public ResponseEntity<TakeOrderResponse> takeOrder(@Valid @RequestBody TakeOrderRequest req) throws Exception {
         return ResponseEntity.ok(deliveryService.takeOrder(req));
     }
 
     @PossibleAccess("DELIVERY")
-    @ApiOperation(value = "배달원 배달 검색 API")
+    @ApiOperation(value = "라이더 배달 검색 API")
     @GetMapping("/search")
     public ResponseEntity<List<SearchDeliveryResponse>> searchDelivery(@ModelAttribute SearchDeliveryRequest req){
         return ResponseEntity.ok(deliveryService.searchDelivery(req));
     }
 
     @PossibleAccess("DELIVERY")
-    @ApiOperation(value = "배달원 배달 상태값 변경 API")
+    @ApiOperation(value = "라이더 배달 상태값 변경 API")
     @PostMapping("/take/status")
     public ResponseEntity<ChangeDeliveryStatusResponse> changeDeliveryStatus(@Valid @RequestBody ChangeDeliveryStatusRequest req) throws Exception {
         return ResponseEntity.ok(deliveryService.changeDeliveryStatus(req));

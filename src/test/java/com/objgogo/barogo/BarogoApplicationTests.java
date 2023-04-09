@@ -105,7 +105,7 @@ class BarogoApplicationTests {
         info.setName("test");
         info.setPassword("1234");
         info.setUsername("objgogo");
-        info.setRoles(List.of(new String[]{"USER", "ADMIN"}));
+        info.setRoles(List.of(new UserType[]{UserType.USER,UserType.DELIVERY}));
 
         ModelMapper mapper = new ModelMapper();
 
@@ -123,7 +123,7 @@ class BarogoApplicationTests {
         info.setName("test");
         info.setPassword("1234");
         info.setUsername("objgogo");
-        info.setRoles(List.of(new String[]{"USER", "ADMIN"}));
+        info.setRoles(List.of(new UserType[]{UserType.USER,UserType.ADMIN}));
 
         RegisterUserResponse res = accountService.registerUser(info);
 
@@ -138,7 +138,7 @@ class BarogoApplicationTests {
         info.setName("test");
         info.setPassword("1234");
         info.setUsername("objgogo");
-        info.setRoles(List.of(new String[]{"USER", "ADMIN"}));
+        info.setRoles(List.of(new UserType[]{UserType.USER,UserType.DELIVERY}));
 
         RegisterUserResponse res = accountService.registerUser(info);
 
@@ -154,29 +154,6 @@ class BarogoApplicationTests {
 
     }
 
-//    @Test
-//    void loginFalse() throws Exception {
-//        RegisterUserRequest info = new RegisterUserRequest();
-//
-//        info.setName("test");
-//        info.setPassword("1234");
-//        info.setUsername("objgogo");
-//        info.setRoles(List.of(new String[]{"USER", "ADMIN"}));
-//
-//        RegisterUserResponse res = accountService.registerUser(info);
-//
-//        LoginRequest req = new LoginRequest();
-//
-//        req.setUsername("objgogo");
-//        req.setPassword("12344");
-//
-//        JwtTokenResponse result = loginService.login(req);
-//
-//        System.out.println(result.toString());
-//
-//
-//    }
-
     @Test
     void checkAuthority() throws Exception {
 
@@ -185,7 +162,7 @@ class BarogoApplicationTests {
         info.setName("test");
         info.setPassword("1234");
         info.setUsername("objgogo");
-        info.setRoles(List.of(new String[]{"USER", "ADMIN"}));
+        info.setRoles(List.of(new UserType[]{UserType.USER,UserType.DELIVERY}));
 
         RegisterUserResponse res = accountService.registerUser(info);
 
@@ -229,7 +206,7 @@ class BarogoApplicationTests {
         info.setName("test");
         info.setPassword("1234");
         info.setUsername("objgogo");
-        info.setRoles(List.of(new String[]{"USER", "ADMIN"}));
+        info.setRoles(List.of(new UserType[]{UserType.USER,UserType.DELIVERY}));
 
         RegisterUserResponse res = accountService.registerUser(info);
 
@@ -357,20 +334,20 @@ class BarogoApplicationTests {
         //사용자 주문 등록
         querydslTest();
 
-        //배달원 회원 가입
+        //라이더 회원 가입
         RegisterUserRequest info = new RegisterUserRequest();
 
         info.setName("test");
         info.setPassword("1234");
         info.setUsername("objgogo1");
-        info.setRoles(List.of(new String[]{"DELIVERY"}));
+        info.setRoles(List.of(new UserType[]{UserType.USER,UserType.DELIVERY}));
 
         RegisterUserResponse res = accountService.registerUser(info);
 
-        //배달원 정보
+        //라이더 정보
         Optional<AccountEntity> delivery = accountRepository.findByUsername("objgogo1");
 
-        //배달원 주문 선택
+        //라이더 주문 선택
         //주문 조회
 
         SearchOrderRequest req = new SearchOrderRequest();
@@ -441,7 +418,7 @@ class BarogoApplicationTests {
 
 
             System.out.println("결과 배달 식별자>> " + d.getId());
-            System.out.println("결과 배달원 식별자>> " + d.getAccount().getId());
+            System.out.println("결과 라이더 식별자>> " + d.getAccount().getId());
             System.out.println("결과 주문 식별자>> " + d.getOrder().getId());
             System.out.println("결과 배달 상태 식별자>> " + deliveryStatusRepository.getOrderDeliveryStatus(d.getOrder(), PageRequest.of(0,1)).get(0).getStatus().toString() );
             System.out.println("--------------");

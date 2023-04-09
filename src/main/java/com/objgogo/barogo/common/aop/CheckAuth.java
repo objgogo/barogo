@@ -16,6 +16,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Collection;
 
 @Aspect
@@ -34,7 +35,7 @@ public class CheckAuth {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         PossibleAccess possibleAccess = signature.getMethod().getAnnotation(PossibleAccess.class);
-        String possibleAccessType = "ROLE_" + possibleAccess.value(); // PossibleAccess 어노테이션의 value 값 가져오기
+        String[] possibleAccessType = possibleAccess.value(); // PossibleAccess 어노테이션의 value 값 가져오기
 
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
@@ -47,18 +48,17 @@ public class CheckAuth {
 
         boolean check = false;
         for(GrantedAuthority a : authorities){
-            if(a.getAuthority().equals(possibleAccessType)){
-                check = true;
-                break;
+            for(String type : possibleAccessType){
+                if(a.getAuthority().equals("ROLE_"+type)){
+                    check = true;
+                    break;
+                }
             }
         }
 
         if(!check){
-            throw new BarogoException("ERROR.ACCESS.000",possibleAccessType);
+            throw new BarogoException("ERROR.ACCESS.000", Arrays.toString(possibleAccessType));
         }
-
-
-
 
     }
 }

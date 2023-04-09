@@ -30,7 +30,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.registerOrder(req));
     }
 
-    @PossibleAccess("USER")
+    @PossibleAccess({"USER","DELIVERY"})
     @GetMapping(value = "/list")
     @ApiOperation(value = "사용자 Order 목록 조회")
     public ResponseEntity<List<OrderInfo>> orderList(@ModelAttribute SearchOrderRequest req){

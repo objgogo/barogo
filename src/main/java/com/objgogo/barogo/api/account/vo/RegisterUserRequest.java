@@ -1,6 +1,7 @@
 package com.objgogo.barogo.api.account.vo;
 
 import com.objgogo.barogo.common.UserType;
+import com.objgogo.barogo.common.exception.BarogoException;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -30,6 +31,6 @@ public class RegisterUserRequest {
 
     @ApiModelProperty(value = "계정 타입 [ADMIN,DELIVERY,USER]")
     @NotEmpty(message = "계정 타입을 입력해 주세요")
-    private List<String> roles;
+    private List<UserType> roles;
 
 }

@@ -54,4 +54,7 @@ public class OrderEntity {
 
     @OneToMany(mappedBy = "order" ,targetEntity = OrderStatusEntity.class, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     private List<OrderStatusEntity> orderStatusEntityList;
+
+    @OneToMany(mappedBy = "order", targetEntity = OrderMenuEntity.class, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    private List<OrderMenuEntity> menuInfoList;
 }

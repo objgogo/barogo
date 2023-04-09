@@ -23,10 +23,6 @@ public class BarogoException extends RuntimeException{
 
         super(getMessagesByCode(code,message));
         this.code = code;
-
-
-
-
     }
 
     private static String getMessageByCode(String code){

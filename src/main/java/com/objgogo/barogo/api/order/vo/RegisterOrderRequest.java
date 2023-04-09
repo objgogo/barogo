@@ -3,6 +3,7 @@ package com.objgogo.barogo.api.order.vo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +37,7 @@ public class RegisterOrderRequest {
     private List<MenuInfo> menuInfoList;
 
     @ApiModelProperty(value = "주문 요청 시간")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDt;
 
 }

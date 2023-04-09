@@ -5,6 +5,7 @@ import com.objgogo.barogo.common.OrderStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
@@ -25,9 +26,11 @@ public class SearchOrderRequest {
 
 
     @ApiModelProperty(value = "검색 startDt")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDt;
 
     @ApiModelProperty(value = "검색 endDt")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDt;
 
 

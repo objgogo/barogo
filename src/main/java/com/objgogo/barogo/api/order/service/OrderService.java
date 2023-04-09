@@ -24,7 +24,7 @@ public interface OrderService {
     List<OrderInfo> getOrderList(SearchOrderRequest req);
 
     /**
-     * 배달원 배달 검색 조회
+     * 라이더 배달 검색 조회
      * @param req
      * @return
      */

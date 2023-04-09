@@ -19,6 +19,7 @@ import com.objgogo.barogo.common.exception.BarogoException;
 import com.objgogo.barogo.common.util.SearchUtil;
 import com.objgogo.barogo.common.util.UserUtil;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -92,10 +93,16 @@ public class OrderServiceImpl implements OrderService {
 
         int offset = (req.getPageNum()-1) * req.getPageSize();
 
+
         QOrderEntity order = QOrderEntity.orderEntity;
         QOrderStatusEntity orderStatus = QOrderStatusEntity.orderStatusEntity;
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        if(userUtil.checkAuthority(UserType.USER)){
+            AccountEntity user = userUtil.me();
+            builder.and(order.account.eq(user));
+        }
 
         if (StringUtils.hasText(req.getCity())) {
             builder.and(order.city.eq(req.getCity()));
@@ -105,41 +112,53 @@ public class OrderServiceImpl implements OrderService {
             builder.and(order.dong.eq(req.getDong()));
         }
 
-        if( null != req.getStartDt() && null != req.getEndDt()){
-            if(SearchUtil.isDateRangeValid(req.getStartDt(),req.getEndDt(),3L)){
-
-                if(req.getStartDt() != null && null == req.getEndDt()){
-                    LocalDateTime startDt = req.getStartDt().atStartOfDay();
-                    LocalDateTime endDt = LocalDateTime.of(req.getStartDt().plusDays(3), LocalTime.MAX);
-
-                    builder.and(order.orderDt.between(startDt,endDt));
-                } else if(req.getEndDt() != null && null == req.getStartDt()){
-                    LocalDateTime startDt = req.getEndDt().minusDays(3).atStartOfDay();
-                    LocalDateTime endDt = LocalDateTime.of(req.getEndDt(), LocalTime.MAX);
-
-                    builder.and(order.orderDt.between(startDt,endDt));
-                }
-            }
-        } else {
-            throw new BarogoException("ERROR.ORDER.004");
-        }
-
         if (StringUtils.hasText(req.getGu())) {
             builder.and(order.gu.eq(req.getGu()));
         }
 
-        if ( null != req.getStatus() && StringUtils.hasText(req.getStatus().toString())) {
-            JPQLQuery<OrderStatus> subQuery = JPAExpressions
-                    .select(orderStatus.status)
-                    .from(orderStatus)
-                    .where(orderStatus.order.id.eq(order.id))
-                    .orderBy(orderStatus.createDt.desc())
-                    .limit(1);
 
-            builder.and(subQuery.eq(req.getStatus()));
+        LocalDateTime startDt = null, endDt = null;
+        //검색 조건 - 시작 ,종료일 없을 경우
+        if(req.getStartDt() == null && req.getEndDt() == null){
+            startDt = LocalDateTime.of(LocalDate.now().minusDays(3),LocalTime.MIN);
+            endDt = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        } else {
+            // 시작일 만 있을 경우
+            if(null != req.getStartDt() && null == req.getEndDt()){
+                startDt = req.getStartDt().atStartOfDay();
+                endDt = LocalDateTime.of(req.getStartDt().plusDays(3), LocalTime.MAX);
+            } else if(null == req.getStartDt() && null != req.getEndDt()){
+                // 종료일만 있을 경우
+                startDt = req.getEndDt().minusDays(3).atStartOfDay();
+                endDt = LocalDateTime.of(req.getEndDt(), LocalTime.MAX);
+            } else if( null != req.getStartDt() && null != req.getEndDt()) {
+                // 둘다 있을 경우
+                if(SearchUtil.isDateRangeValid(req.getStartDt(),req.getEndDt(),3L)){
+                   startDt = req.getStartDt().atStartOfDay();
+                   endDt = LocalDateTime.of(req.getEndDt(),LocalTime.MAX);
+                } else{
+                    throw new BarogoException("ERROR.ORDER.004");
+                }
+            }
+        }
+
+        builder.and(order.orderDt.between(startDt,endDt));
+
+        SubQueryExpression<OrderStatus> subQuery = JPAExpressions
+                .select(orderStatus.status)
+                .from(orderStatus)
+                .where(orderStatus.order.eq(order))
+                .orderBy(orderStatus.createDt.desc())
+                .limit(1);
+
+        if (req.getStatus() == null) {
+            builder.and(orderStatus.status.eq(subQuery));
+        } else {
+            builder.and(orderStatus.status.eq(subQuery).and(orderStatus.status.eq(req.getStatus())));
         }
 
         List<OrderEntity> result = queryFactory.selectFrom(order)
+                .innerJoin(order.orderStatusEntityList, orderStatus)
                 .where(builder)
                 .offset(offset)
                 .limit(req.getPageSize())
