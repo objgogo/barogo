@@ -94,8 +94,7 @@ class BarogoApplicationTests {
         System.out.println("test");
     }
 
-    //TODO: RegisterUserRequest 객체에 password를 직접 set 하므로 validation 체크를 무시하게 됨.
-    //TODO: API 호출 Test로 재 검증
+
     @Test
     void modelMapperTest(){
 
